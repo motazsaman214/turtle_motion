@@ -2,7 +2,6 @@ import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
-import sys
 import math
 
 
@@ -10,59 +9,60 @@ class GoToGoal(Node):
 
     def __init__(self):
         super().__init__('Go_To_Goal')
-        self.vel_pub = self.create_publisher( Twist , '/turtle1/cmd_vel', 10)
-        self.pos_sub = self.create_subscription( Pose ,'/turtle1/pose', self.pose_callback ,10 )
-        self.create_timer = self.create_timer(0.1,self.go_to_goal)
-        self.pose=Pose()
+        self.vel_pub = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)
+        self.pose_sub = self.create_subscription(Pose, '/turtle1/pose', self.pose_callback, 10)
+        self.goal_sub = self.create_subscription(Pose, '/goal_pose', self.goal_callback, 10)
+        self.timer = self.create_timer(0.1, self.go_to_goal)
 
-    def pose_callback(self,data):
-        
-        self.pose= data
+        self.pose = Pose()
+        self.goal = None
+        self.goal_reached = False
+
+    def pose_callback(self, msg):
+        self.pose = msg
+
+    def goal_callback(self, msg):
+        self.goal = msg
+        self.goal_reached = False
+        self.get_logger().info(f'New Goal Received: x={msg.x}, y={msg.y}, theta={msg.theta}')
 
     def go_to_goal(self):
-        goal = Pose()
+        if self.goal is None or self.goal_reached:
+            return
 
-        goal.x = float(sys.argv[1])
-        goal.y = float(sys.argv[2])
+        velocity = Twist()
 
-        goal.theta=float(sys.argv[3])
+        distance = math.sqrt((self.goal.x - self.pose.x) ** 2 + (self.goal.y - self.pose.y) ** 2)
+        angle_to_goal = math.atan2((self.goal.y - self.pose.y), (self.goal.x - self.pose.x))
+        angle_error = angle_to_goal - self.pose.theta
 
-        velocity= Twist()
+        angle_error = math.atan2(math.sin(angle_error), math.cos(angle_error))
 
-        distance_to_goal = math.sqrt( (goal.x - self.pose.x )**2 + (goal.y - self.pose.y)**2)
-        angel_to_goal = math.atan2( (goal.y - self.pose.y) , (goal.x - self.pose.y) )
+        distance_threshold = 0.1
+        angle_threshold = 0.01
+        kp = 6.0
 
-        distance_threeshold = 0.1
-        angel_threeshold = 0.01
-
-        angel_error = angel_to_goal - self.pose.theta
-
-        kp=6
-
-        if abs(angel_error)>angel_threeshold:
-            velocity.angular.z = kp * angel_error
+        if abs(angle_error) > angle_threshold:
+            velocity.angular.z = kp * angle_error
+        elif distance >= distance_threshold:
+            velocity.linear.x = kp * distance
         else:
-            if distance_to_goal >= distance_threeshold:
-                velocity.linear.x = kp * distance_to_goal
-            else:
-                velocity.linear.x = 0.0
+            velocity.linear.x = 0.0
+            velocity.angular.z = 0.0
+            self.goal_reached = True
+            self.get_logger().info("Goal Reached")
 
-                self.get_logger().info("Goal Reached ")
-                quit()
         self.vel_pub.publish(velocity)
-
-
 
 
 def main(args=None):
     rclpy.init(args=args)
-    go_to_goal = GoToGoal()
-    rclpy.spin(go_to_goal)
-    go_to_goal.destroy_node()
+    node = GoToGoal()
+    rclpy.spin(node)
+    node.destroy_node()
     rclpy.shutdown()
 
 
-
-if __name__ == 'main':
-
+if __name__ == '__main__':
     main()
+

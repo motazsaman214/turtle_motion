@@ -27,7 +27,7 @@ class CircularMotion(Node):
             return
 
         velocity.linear.x = linear_vel
-        velocity.linear.y = 0.0  # Keep linear y velocity zero for a 2D motion
+        velocity.linear.y = 0.0 # Keep linear y velocity zero for a 2D motion
 
         # Compute angular velocity for circular motion (angular speed = linear speed / radius)
         velocity.angular.z = linear_vel / radius
