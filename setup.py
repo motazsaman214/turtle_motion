@@ -23,6 +23,7 @@ setup(
             'turtle_GoToGoal = turtle_motion.GoToGoal:main',
             'turtle_follower = turtle_motion.turtle_follower:main',
             'turtle_circular_motion = turtle_motion.turtle1_circular_motion:main',
+            'turtle_bouncing = turtle_motion.turtlesim_bouncing:main',
         ],
     },
 )
