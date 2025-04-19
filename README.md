@@ -1,54 +1,127 @@
-# turtle_motion: ROS Nodes for Turtlebot Control
+# Turtle Motion ROS2 Package
 
-This repository contains ROS (Robot Operating System) nodes for controlling a simulated turtlebot using the turtlesim package. The nodes provide functionalities for:
+![ROS2 Version](https://img.shields.io/badge/ROS2-Humble/Hawksbill-brightgreen) ![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 
-- **Goal Following (`turtle_follower`):**
-  - Enables a turtle (e.g., `turtle2`) to follow another turtle (e.g., `turtle1`).
-  - Subscribes to the pose of the target turtle (`/turtle1/pose`).
-  - Calculates the distance and angle between the following turtle and the target turtle.
-  - Implements a proportional control strategy to adjust the linear and angular velocities of the following turtle, guiding it towards the target.
-  - Stops the movement and logs a message upon reaching the goal within a specified threshold.
+A ROS2 package for creating advanced turtle motion patterns in Turtlesim. Features sinusoidal/cosine waves, circular motion, wall bouncing, goal chasing, follower behavior, and real-time plotting.
 
-- **Circular Motion (`turtle1_circular_motion`):**
-  - Allows a turtle (e.g., `turtle1`) to perform circular motion.
-  - Takes two command-line arguments: linear velocity and radius.
-  - Validates user input to ensure numeric values are provided.
-  - Sets the linear x velocity of the turtle to the provided value and maintains zero linear y velocity for a 2D motion.
-  - Calculates the angular velocity based on the formula `angular_velocity = linear_velocity / radius` to achieve the desired circular motion.
-  - Publishes the calculated twist message (`/turtle1/cmd_vel`) to control the turtle's movement.
-  - Logs information about the applied linear and angular velocities for debugging or monitoring purposes.
+# turtle_motion
 
-- **Go to Goal (`GoToGoal`):**
-  - Enables a turtle (e.g., `turtle1`) to navigate to a specified goal location.
-  - Takes three command-line arguments: desired x, y coordinates, and target orientation (theta) of the goal pose.
-  - Subscribes to the current pose of the turtle (`/turtle1/pose`).
-  - Calculates the distance and angle between the current and goal poses.
-  - Employs a proportional control approach to determine the linear and angular velocities for movement.
-  - Stops the movement and logs a "Goal Reached" message upon reaching the goal within predefined thresholds for distance and angle.
+A ROS 2 package for controlling and visualizing the motion of turtlesim turtles with a variety of motion behaviors and live plotting tools.
 
-## Getting Started
+---
 
-1. Clone this repository to your local machine.
-2. Install ROS dependencies according to your ROS installation.
-3. Source your ROS environment (`source /opt/ros/foxy/setup.bash` for Foxy or similar for your ROS version).
-4. Navigate to the repository directory in your terminal.
-5. Build the package:
+# Turtle Motion Demo
+
+![Turtle sinusoidal Motion ](Media/sin_wave.gif)
+
+
+## Features
+
+- **Go To Goal**: Move a turtle to a specified pose using proportional control ([`turtle_motion.GoToGoal`](turtle_motion/GoToGoal.py)).
+- **Turtle Follower**: Make `/turtle2` follow `/turtle1` ([`turtle_motion.turtle_follower`](turtle_motion/turtle_follower.py)).
+- **Circular Motion**: Move the turtle in a circle with configurable velocity and radius ([`turtle_motion.turtle_circular_motion`](turtle_motion/turtle_circular_motion.py)).
+- **Sinusoidal Motion**: Move the turtle along a sine wave ([`turtle_motion.turtle_sin_motion`](turtle_motion/turtle_sin_motion.py)).
+- **Cosine Motion**: Move the turtle along a cosine wave ([`turtle_motion.turtle_cos_motion`](turtle_motion/turtle_cos_motion.py)).
+- **Bouncing Motion**: Move the turtle back and forth between the walls ([`turtle_motion.turtle_bouncing_motion`](turtle_motion/turtle_bouncing_motion.py)).
+- **Live Plotter**: Real-time plotting of the turtle's x and y positions ([`turtle_motion.turtle_plotter`](turtle_motion/turtle_plotter.py)).
+
+---
+
+## Package Structure
+
+- [`turtle_motion/`](turtle_motion/)
+  - [`GoToGoal.py`](turtle_motion/GoToGoal.py): Go-to-goal controller node.
+  - [`turtle_follower.py`](turtle_motion/turtle_follower.py): Follower node for `/turtle2`.
+  - [`turtle_circular_motion.py`](turtle_motion/turtle_circular_motion.py): Circular motion node.
+  - [`turtle_sin_motion.py`](turtle_motion/turtle_sin_motion.py): Sinusoidal motion node.
+  - [`turtle_cos_motion.py`](turtle_motion/turtle_cos_motion.py): Cosine motion node.
+  - [`turtle_bouncing_motion.py`](turtle_motion/turtle_bouncing_motion.py): Bouncing motion node.
+  - [`turtle_plotter.py`](turtle_motion/turtle_plotter.py): Live plotting node.
+
+---
+
+## Installation
+
+1. **Clone the repository:**
     ```bash
-    cd turtle_motion
+    cd ~/ros2_ws/src
+    git clone <this-repo-url> turtle_motion
+    ```
+
+2. **Install dependencies:**
+    ```bash
+    sudo apt update
+    sudo apt install ros-${ROS_DISTRO}-turtlesim python3-matplotlib
+    ```
+
+3. **Build the package:**
+    ```bash
+    cd ~/ros2_ws
     colcon build --symlink-install
     ```
 
-## Running the Nodes
-
-To run the nodes:
-
-1. Open a new terminal and source the ROS environment.
-2. In the second terminal, navigate to the repository directory and run the desired node using the following commands (replace `<goal_x>`, `<goal_y>`, `<goal_theta>`, `<linear_velocity>`, and `<radius>` with the appropriate values):
-
+4. **Source your workspace:**
     ```bash
-    ros2 run turtle_motion turtle_follower
-    ros2 run turtle_motion turtle1_circular_motion <linear_velocity> <radius>
-    ros2 run turtle_motion GoToGoal <goal_x> <goal_y> <goal_theta>
+    source install/setup.bash
     ```
 
-Replace `<goal_x>`, `<goal_y>`, `<goal_theta>`, `<linear_velocity>`, and `<radius>` with the specific values you want to use for your simulations.
+---
+
+## Usage
+
+First, start the turtlesim node:
+```bash
+ros2 run turtlesim turtlesim_node
+```
+
+Then, in separate terminals, run any of the following nodes:
+
+### Go To Goal
+```bash
+ros2 run turtle_motion turtle_GoToGoal
+```
+Publish a goal pose to `/goal_pose` (e.g., using `ros2 topic pub`).
+
+### Turtle Follower
+```bash
+ros2 service call /spawn turtlesim/srv/Spawn "{x: 2.0, y: 2.0, theta: 0.0, name: 'turtle2'}"
+ros2 run turtle_motion turtle_follower
+```
+
+### Circular Motion
+```bash
+ros2 run turtle_motion turtle_circular_motion <linear_velocity> <radius>
+```
+
+### Sinusoidal Motion
+```bash
+ros2 run turtle_motion turtle_sin_motion
+```
+
+### Cosine Motion
+```bash
+ros2 run turtle_motion turtle_cos_motion
+```
+
+### Bouncing Motion
+```bash
+ros2 run turtle_motion turtle_bouncing_motion
+```
+
+### Live Plotter
+```bash
+ros2 run turtle_motion turtle_ploter
+```
+
+
+## License
+
+This project is licensed under the Apache 2.0 License.  
+See [package.xml](package.xml) for full license details.
+
+---
+
+## Author
+
+Motaz Elsaman  
+Email: <motaz.elsaman@ejust.eud.eg>
