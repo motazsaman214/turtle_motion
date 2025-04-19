@@ -20,10 +20,13 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'turtle_circular_motion = turtle_motion.turtle_circular_motion:main',
+            'turtle_bouncing_motion = turtle_motion.turtle_bouncing_motion:main',
+            'turtle_sin_motion = turtle_motion.turtle_sin_motion:main',
+            'turtle_cos_motion = turtle_motion.turtle_cos_motion:main',
             'turtle_GoToGoal = turtle_motion.GoToGoal:main',
             'turtle_follower = turtle_motion.turtle_follower:main',
-            'turtle_circular_motion = turtle_motion.turtle1_circular_motion:main',
-            'turtle_bouncing = turtle_motion.turtlesim_bouncing:main',
+            'turtle_ploter = turtle_motion.turtle_plotter:main',
         ],
     },
 )

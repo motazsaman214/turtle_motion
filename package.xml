@@ -16,6 +16,8 @@
   <exec_depend>sys</exec_depend>
   <exec_depend>turtlesim</exec_depend>
   <exec_depend>matbotlib</exec_depend>
+  <exec_depend>threading</exec_depend>
+  <exec_depend>time</exec_depend>
 
 
   <test_depend>ament_copyright</test_depend>
