@@ -1,3 +1,26 @@
+"""
+turtle_circular_motion ROS2 Node
+
+This node controls a turtlesim turtle to move in a circular path.
+It publishes velocity commands to the turtle based on user-specified linear velocity and radius.
+
+Usage:
+    ros2 run turtle_motion turtle_circular_motion <linear_velocity> <radius>
+
+Arguments:
+    linear_velocity (float): The desired linear velocity of the turtle.
+    radius (float): The radius of the circular path.
+
+Publications:
+    /turtle1/cmd_vel (geometry_msgs.msg.Twist): Publishes velocity commands to move the turtle.
+
+Functionality:
+    - Reads linear velocity and radius from command-line arguments.
+    - Computes the required angular velocity for circular motion.
+    - Publishes velocity commands to move the turtle in a circle.
+    - Logs warnings if arguments are missing or invalid.
+"""
+
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -16,7 +39,7 @@ class CircularMotion(Node):
 
         # Check if the required command-line arguments are provided
         if len(sys.argv) < 3:
-            self.get_logger().warn("Usage: python circular_motion.py <linear_velocity> <radius>")
+            self.get_logger().warn("Usage: ros2 run turtle_motion turtle_circular_motion <linear_velocity> <radius>")
             return
         
         try:

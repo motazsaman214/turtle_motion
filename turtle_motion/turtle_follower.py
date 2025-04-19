@@ -1,3 +1,22 @@
+"""
+turtle_follower ROS2 Node
+
+This node makes a second turtlesim turtle (/turtle2) follow the first turtle (/turtle1) by subscribing to their poses and publishing velocity commands.
+
+Subscriptions:
+    /turtle1/pose (turtlesim.msg.Pose): Receives the pose of the leader turtle.
+    /turtle2/pose (turtlesim.msg.Pose): Receives the pose of the follower turtle.
+
+Publications:
+    /turtle2/cmd_vel (geometry_msgs.msg.Twist): Publishes velocity commands to move the follower turtle.
+
+Functionality:
+    - Computes the distance and angle to the leader turtle.
+    - Rotates the follower turtle towards the leader before moving forward.
+    - Stops the follower when it is close enough to the leader.
+    - Logs when the goal is reached.
+"""
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist

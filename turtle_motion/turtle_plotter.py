@@ -1,3 +1,18 @@
+"""
+turtle_plotter ROS2 Node
+
+This node subscribes to the pose of a turtlesim turtle and provides a live plot of the turtle's x and y positions over time.
+It uses matplotlib in interactive mode to update the plots in real time.
+
+Subscriptions:
+    /turtle1/pose (turtlesim.msg.Pose): Receives the current pose of the turtle.
+
+Functionality:
+    - Records the x and y positions and timestamps as the turtle moves.
+    - Plots x and y positions versus time in real time using matplotlib.
+    - Uses threading to run the plotting loop without blocking ROS2 callbacks.
+"""
+
 import rclpy
 from rclpy.node import Node
 from turtlesim.msg import Pose

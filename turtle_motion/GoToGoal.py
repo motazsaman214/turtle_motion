@@ -1,3 +1,22 @@
+"""
+GoToGoal ROS2 Node
+
+This node controls a turtlesim turtle to move towards a specified goal pose.
+
+Subscriptions:
+    /turtle1/pose (turtlesim.msg.Pose): Receives the current pose of the turtle.
+    /goal_pose (turtlesim.msg.Pose): Receives the target goal pose for the turtle.
+
+Publications:
+    /turtle1/cmd_vel (geometry_msgs.msg.Twist): Publishes velocity commands to move the turtle.
+
+Functionality:
+    - Computes the distance and angle to the goal.
+    - Rotates the turtle towards the goal before moving forward.
+    - Stops the turtle when the goal is reached within a threshold.
+    - Logs when a new goal is received and when the goal is reached.
+"""
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -65,4 +84,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-

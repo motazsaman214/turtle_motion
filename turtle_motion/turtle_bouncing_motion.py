@@ -1,3 +1,23 @@
+"""
+turtle_bouncing_motion ROS2 Node
+
+This node controls a turtlesim turtle to move horizontally back and forth ("bouncing") between the left and right walls.
+It publishes velocity commands to move the turtle and reverses direction when the turtle reaches the boundaries.
+The node also records the turtle's x position over time and provides plotting functions to visualize the trajectory and position vs. time.
+
+Subscriptions:
+    /turtle1/pose (turtlesim.msg.Pose): Receives the current pose of the turtle.
+
+Publications:
+    /turtle1/cmd_vel (geometry_msgs.msg.Twist): Publishes velocity commands to move the turtle.
+
+Functionality:
+    - Moves the turtle right until it reaches the right wall, then reverses direction.
+    - Records x position and time for plotting.
+    - Provides methods to plot the trajectory and position vs. time.
+    - Includes a live plot option for real-time visualization.
+"""
+
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Twist
@@ -20,8 +40,8 @@ class turtlesim_bouncing_motion(Node):
         self.time_range= []
         self.x_pose=[]
 
-
         self.pose_x = 0.0
+
     def bouncing(self):
         vel = Twist()
         vel.linear.x = 20.0 if self.move_right else -20.0
@@ -38,74 +58,6 @@ class turtlesim_bouncing_motion(Node):
             self.move_right = True
 
 
-    def plot_trajectory(self):
-        if not self.x_pose:
-            self.get_logger().info("No data to plot.")
-            return
-
-        # Extract x and y position data
-        times = [point[0] for point in self.x_pose]
-        x_positions = [point[1] for point in self.x_pose]
-        y_positions = [self.pose.y for _ in self.x_pose]  # Assuming y is constant for simplicity
-
-        # Plot the trajectory
-        plt.figure(figsize=(10, 6))
-        plt.plot(x_positions, y_positions, label="Turtle Trajectory")
-        plt.xlabel("X Position")
-        plt.ylabel("Y Position")
-        plt.title("Turtle Trajectory")
-        plt.legend()
-        plt.grid()
-        plt.show()
-
-
-    def plot_position_vs_time(self):
-        if not self.x_pose:
-            self.get_logger().info("No data to plot.")
-            return
-
-        # Extract time, x, and y position data
-        times = [point[0] for point in self.x_pose]
-        x_positions = [point[1] for point in self.x_pose]
-        y_positions = [self.pose.y for _ in self.x_pose]  # Assuming y is constant for simplicity
-
-        # Plot x and y positions against time
-        plt.figure(figsize=(10, 6))
-        plt.plot(times, x_positions, label="X Position vs Time")
-        plt.plot(times, y_positions, label="Y Position vs Time", linestyle="--")
-        plt.xlabel("Time (s)")
-        plt.ylabel("Position")
-        plt.title("Turtle Position vs Time")
-        plt.legend()
-        plt.grid()
-        plt.show()
-    def live_plot(self):
-        from matplotlib.animation import FuncAnimation
-
-        # Initialize the plot
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.set_xlim(0, 12)  # Adjust based on the turtle's environment
-        ax.set_ylim(0, 12)  # Adjust based on the turtle's environment
-        ax.set_xlabel("X Position")
-        ax.set_ylabel("Y Position")
-        ax.set_title("Live Turtle Trajectory")
-        line, = ax.plot([], [], label="Turtle Trajectory")
-        ax.legend()
-        ax.grid()
-
-        # Update function for the animation
-        def update(frame):
-            if not self.x_pose:
-                return line,
-            x_positions = [point[1] for point in self.x_pose]
-            y_positions = [self.pose.y for _ in self.x_pose]  # Assuming y is constant for simplicity
-            line.set_data(x_positions, y_positions)
-            return line,
-
-        # Create the animation
-        ani = FuncAnimation(fig, update, interval=100)  # Update every 100ms
-        plt.show()
-
 def main(args=None):
     rclpy.init(args=args)
     
@@ -120,27 +72,6 @@ def main(args=None):
     turtlesim_bouncing_node.plot_position_vs_time()
     rclpy.shutdown()
 
-# def main(args=None):
-#     rclpy.init(args=args)
-    
-#     turtle_bouncing_node = turtlesim_bouncing_motion()
-
-#     try:
-#         # Start the live plot in a separate thread
-#         import threading
-#         plot_thread = threading.Thread(target=turtle_bouncing_node.live_plot)
-#         plot_thread.start()
-
-#         # Spin the node
-#         rclpy.spin(turtle_bouncing_node)
-#     except KeyboardInterrupt:
-#         turtle_bouncing_node.get_logger().info("Shutting down...")
-
-#     rclpy.shutdown()
 
 if __name__ == "__main__":
     main()
-
-
-
-
